@@ -90,7 +90,8 @@
   .empty { text-align: center; color: var(--muted); padding: 60px 20px; line-height: 1.5; }
   .empty h2 { color: var(--text); margin-bottom: 8px; }
 
-  #msg { color: var(--muted); font-size: .85rem; padding: 0 28px; min-height: 1.2em; }
+  #msg { color: var(--muted); font-size: .85rem; padding: 14px 28px 0; }
+  #msg:empty { display: none; }
   #msg.err { color: #ff8a8a; }
 
   /* ---------- Now Playing page ---------- */
@@ -251,18 +252,74 @@
   .icon-btn:hover { color: #fff; background: var(--hover); }
   .icon-btn svg { transition: transform .35s; }
   .icon-btn:hover svg { transform: rotate(60deg); }
+
+  /* ---------- Home page ---------- */
+  .logo-home { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .home-top { padding: 32px 28px 8px; }
+  .home-top h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.6rem); }
+  .q-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; padding: 12px 28px 8px; }
+  .q-tile { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.1); border-radius: 6px; overflow: hidden; cursor: pointer; padding-right: 10px; transition: background .2s; }
+  .q-tile:hover { background: rgba(255,255,255,.2); }
+  .q-art { width: 56px; height: 56px; flex-shrink: 0; display: grid; place-items: center; font-size: 1.6rem; font-weight: 800; color: #fff; overflow: hidden; background: #282828; }
+  .q-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .q-name { flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .q-play, .card-play {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--green); color: #000; border: none; font-size: 1rem; cursor: pointer;
+    display: grid; place-items: center; box-shadow: 0 6px 16px rgba(0,0,0,.45);
+    opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s;
+  }
+  .q-tile:hover .q-play, .card:hover .card-play, .q-play:focus-visible, .card-play:focus-visible { opacity: 1; transform: none; }
+  .q-tile .q-play:hover, .card .card-play:hover { opacity: 1; transform: scale(1.06); background: #1ed760; }
+  .shelves { padding: 8px 0 32px; }
+  .shelf { padding: 18px 0 0; }
+  .shelf-head { display: flex; align-items: center; justify-content: space-between; padding: 0 28px 10px; }
+  .shelf-head h2 { margin: 0; font-size: 1.4rem; }
+  .shelf-arrows { display: flex; gap: 6px; }
+  .shelf-arrows button { width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(0,0,0,.4); color: #fff; font-size: 1.2rem; cursor: pointer; line-height: 1; }
+  .shelf-arrows button:hover { background: rgba(255,255,255,.2); }
+  .shelf-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 6px; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .shelf-row::-webkit-scrollbar { display: none; }
+  .card { flex: 0 0 172px; padding: 12px; border-radius: 8px; cursor: pointer; scroll-snap-align: start; transition: background .2s; }
+  .card:hover { background: rgba(255,255,255,.1); }
+  .card-cover { position: relative; margin-bottom: 12px; }
+  .card-art { aspect-ratio: 1 / 1; width: 100%; border-radius: 6px; overflow: hidden; display: grid; place-items: center; font-size: 2.8rem; font-weight: 800; color: #fff; background: #282828; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+  .card-art.round { border-radius: 50%; }
+  .card-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card-play { position: absolute; right: 8px; bottom: 8px; }
+  .card-title { font-weight: 700; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-sub { color: var(--muted); font-size: .82rem; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .home-empty { text-align: center; padding: 70px 24px; color: var(--muted); }
+  .home-empty h2 { color: var(--text); margin: 0 0 8px; font-size: 1.6rem; }
+  .home-empty p { margin: 0 0 18px; }
+  @media (hover: none) {
+    .q-play, .card-play { opacity: 1; transform: none; }
+  }
+  @media (max-width: 800px) {
+    .home-top { padding: 22px 18px 4px; }
+    .q-grid { padding: 10px 18px 4px; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .q-art { width: 48px; height: 48px; }
+    .q-name { font-size: .85rem; }
+    .q-play { display: none; }
+    .shelf-head { padding: 0 18px 8px; }
+    .shelf-arrows { display: none; }
+    .shelf-row { padding: 0 10px 6px; }
+    .card { flex-basis: 140px; padding: 10px; }
+  }
 </style>
 </head>
 <body>
 
 <aside class="sidebar">
   <div class="logo">
-    <span>♪</span> <b class="brand">VibeX</b>
+    <div class="logo-home" id="logoHome" title="Home">
+      <span>♪</span> <b class="brand">VibeX</b>
+    </div>
     <button class="icon-btn" id="navSettings" title="Settings" aria-label="Settings">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
   </div>
-  <div class="nav-item active" id="navLib">HOME</div>
+  <div class="nav-item active" id="navHome">HOME</div>
+  <div class="nav-item" id="navLib">YOUR LIBRARY</div>
   <button class="add-btn" id="addBtn">＋ Add Music</button>
   <input type="file" id="files" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac,.opus" multiple hidden>
   <div class="pl-head"><span>Playlists</span><button id="newPl" title="Create playlist">＋</button></div>
@@ -271,33 +328,40 @@
 </aside>
 
 <main class="main" id="main">
-  <div class="hero">
-    <div class="hero-art" id="heroArt">🎧</div>
-    <div style="min-width:0">
-      <small id="heroLabel">Library</small>
-      <h1 id="heroTitle">Your Library</h1>
-      <p id="count">0 songs</p>
-    </div>
-  </div>
-
-  <div class="toolbar">
-    <button class="big-play" id="bigPlay" title="Play">▶</button>
-    <button class="pill" id="renamePl" hidden>Rename</button>
-    <button class="pill danger" id="deletePl" hidden>Delete playlist</button>
-    <input class="search" id="search" type="search" placeholder="Search title, artist, album">
-  </div>
   <div id="msg"></div>
 
-  <div class="list">
-    <div class="head">
-      <div style="text-align:center">#</div>
-      <div data-sort="title" id="hTitle">Title</div>
-      <div data-sort="album" id="hAlbum">Album</div>
-      <div class="dur" data-sort="duration" id="hDur">Time</div>
-      <div></div>
+  <!-- Home page -->
+  <div id="homeView"></div>
+
+  <!-- Library / playlist page -->
+  <div id="libView" hidden>
+    <div class="hero">
+      <div class="hero-art" id="heroArt">🎧</div>
+      <div style="min-width:0">
+        <small id="heroLabel">Library</small>
+        <h1 id="heroTitle">Your Library</h1>
+        <p id="count">0 songs</p>
+      </div>
     </div>
-    <div id="rows"></div>
-    <div class="empty" id="empty"></div>
+
+    <div class="toolbar">
+      <button class="big-play" id="bigPlay" title="Play">▶</button>
+      <button class="pill" id="renamePl" hidden>Rename</button>
+      <button class="pill danger" id="deletePl" hidden>Delete playlist</button>
+      <input class="search" id="search" type="search" placeholder="Search title, artist, album">
+    </div>
+
+    <div class="list">
+      <div class="head">
+        <div style="text-align:center">#</div>
+        <div data-sort="title" id="hTitle">Title</div>
+        <div data-sort="album" id="hAlbum">Album</div>
+        <div class="dur" data-sort="duration" id="hDur">Time</div>
+        <div></div>
+      </div>
+      <div id="rows"></div>
+      <div class="empty" id="empty"></div>
+    </div>
   </div>
 </main>
 
@@ -400,7 +464,8 @@
   /* ================= state ================= */
   let tracks = [];            // song records
   let playlists = [];         // {id, name, trackIds[]}
-  let view = 'library';       // 'library' or a playlist id
+  let view = 'home';          // 'home', 'library', or a playlist id
+  let ready = false;          // true once saved songs have been loaded
   let sortKey = '', sortDir = 1;
   let queue = [];             // track ids currently being played through
   let curId = null;
@@ -411,6 +476,15 @@
   const coverUrls = new Map();
   const colorCache = new Map();
   const retried = new Set();
+
+  // recently played songs (for "Jump back in" on the Home page)
+  const RECENT_KEY = 'vibex-recent-v1';
+  let recents = [];
+  try { recents = JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch (e) {}
+  function pushRecent(id) {
+    recents = [id, ...recents.filter(x => x !== id)].slice(0, 30);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(recents)); } catch (e) {}
+  }
 
   /* ================= helpers ================= */
   const byId = id => tracks.find(t => t.id === id);
@@ -522,7 +596,7 @@
     if (p) { added.forEach(t => { if (!p.trackIds.includes(t.id)) p.trackIds.push(t.id); }); savePlaylist(p); }
     if (!$('msg').classList.contains('err')) msg(skipped ? 'Added ' + added.length + '. Skipped ' + skipped + ' non-audio file(s).' : '');
     renderAll();
-    if (curId == null && added.length) playTrack(added[0].id, viewList().map(t => t.id));
+    if (curId == null && added.length) playTrack(added[0].id, currentIds());
   }
 
   async function removeTrack(id) {
@@ -553,7 +627,7 @@
   async function deletePlaylist(p) {
     if (db && typeof p.id === 'number') { try { await idb('playlists', 'readwrite', s => s.delete(p.id)); } catch (e) {} }
     playlists = playlists.filter(x => x !== p);
-    if (view === p.id) view = 'library';
+    if (view === p.id) view = 'home';
     renderAll();
   }
 
@@ -658,9 +732,23 @@
     }
     return list;
   }
-  function setView(v) { view = v; sortKey = ''; closeMenu(); renderAll(); $('main').scrollTop = 0; }
+  // song ids to play through from the page you are on (Home = whole library)
+  const currentIds = () => (view === 'home' ? tracks.map(t => t.id) : viewList().map(t => t.id));
+
+  function setView(v, keepSearch) {
+    view = v; sortKey = '';
+    if (!keepSearch) $('search').value = '';
+    closeMenu(); renderAll(); $('main').scrollTop = 0;
+  }
+
+  function showView() {
+    const home = view === 'home';
+    $('homeView').hidden = !home;
+    $('libView').hidden = home;
+  }
 
   function renderSidebar() {
+    $('navHome').className = 'nav-item' + (view === 'home' ? ' active' : '');
     $('navLib').className = 'nav-item' + (view === 'library' ? ' active' : '');
     const box = $('plList'); box.innerHTML = '';
     if (!playlists.length) {
@@ -678,6 +766,7 @@
   }
 
   function renderMain() {
+    if (view === 'home') return;
     const pl = playlists.find(p => p.id === view);
     const base = baseList();
     const list = viewList();
@@ -744,6 +833,155 @@
     $('bigPlay').textContent = (sameQueue && !audio.paused) ? '⏸' : '▶';
   }
 
+  /* ================= Home page ================= */
+  function makeArt(cls, list, label, emoji) {
+    const el = document.createElement('div'); el.className = cls;
+    const t = list.find(x => x.cover);
+    if (t) { const img = document.createElement('img'); img.src = coverUrl(t); img.alt = ''; img.loading = 'lazy'; el.appendChild(img); }
+    else { el.setAttribute('style', thumbStyle(label)); el.textContent = emoji || label.charAt(0).toUpperCase(); }
+    return el;
+  }
+
+  function playList(list) {
+    if (!list.length) return;
+    const ids = list.map(t => t.id);
+    const first = shuffleOn ? ids[Math.floor(Math.random() * ids.length)] : ids[0];
+    playTrack(first, ids);
+  }
+
+  // open the library already filtered to an artist or album
+  function openFiltered(text) { $('search').value = text; setView('library', true); }
+
+  function groupBy(keyFn) {
+    const m = new Map();
+    tracks.forEach(t => {
+      const k = keyFn(t); if (!k) return;
+      if (!m.has(k)) m.set(k, []);
+      m.get(k).push(t);
+    });
+    return [...m.entries()].map(([name, list]) => ({ name, list }))
+      .sort((a, b) => b.list.length - a.list.length || a.name.localeCompare(b.name));
+  }
+
+  function card({ art, title, sub, onOpen, onPlay }) {
+    const c = document.createElement('div'); c.className = 'card';
+    const cover = document.createElement('div'); cover.className = 'card-cover';
+    cover.appendChild(art);
+    const pb = document.createElement('button'); pb.className = 'card-play'; pb.textContent = '▶'; pb.title = 'Play';
+    pb.onclick = e => { e.stopPropagation(); onPlay(); };
+    cover.appendChild(pb);
+    const t = document.createElement('div'); t.className = 'card-title'; t.textContent = title;
+    const s = document.createElement('div'); s.className = 'card-sub'; s.textContent = sub;
+    c.append(cover, t, s);
+    c.onclick = onOpen;
+    return c;
+  }
+
+  function shelf(title, cards) {
+    const sec = document.createElement('section'); sec.className = 'shelf';
+    const head = document.createElement('div'); head.className = 'shelf-head';
+    const h = document.createElement('h2'); h.textContent = title;
+    const arrows = document.createElement('div'); arrows.className = 'shelf-arrows';
+    const row = document.createElement('div'); row.className = 'shelf-row';
+    cards.forEach(c => row.appendChild(c));
+    const mk = (txt, dir) => {
+      const b = document.createElement('button'); b.textContent = txt;
+      b.setAttribute('aria-label', dir < 0 ? 'Scroll left' : 'Scroll right');
+      b.onclick = () => row.scrollBy({ left: dir * row.clientWidth * 0.8, behavior: 'smooth' });
+      return b;
+    };
+    arrows.append(mk('‹', -1), mk('›', 1));
+    head.append(h, arrows);
+    sec.append(head, row);
+    return sec;
+  }
+
+  function renderHome() {
+    const st = $('main').scrollTop;
+    const box = $('homeView'); box.innerHTML = '';
+    if (!ready) return;
+
+    const hr = new Date().getHours();
+    const hello = hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening';
+    const top = document.createElement('div'); top.className = 'home-top';
+    const g = document.createElement('h1'); g.textContent = hello;
+    top.appendChild(g); box.appendChild(top);
+
+    if (!tracks.length) {
+      const w = document.createElement('div'); w.className = 'home-empty';
+      w.innerHTML = '<h2>Welcome to VibeX</h2><p>Add some music to get started. Your songs stay on this device.</p>';
+      const b = document.createElement('button'); b.className = 'add-btn'; b.textContent = '＋ Add Music';
+      b.onclick = () => $('files').click();
+      w.appendChild(b); box.appendChild(w);
+      return;
+    }
+
+    // quick-access tiles: Your Library + playlists
+    const grid = document.createElement('div'); grid.className = 'q-grid';
+    const tiles = [{ name: 'Your Library', list: tracks.slice(), emoji: '🎧', open: () => setView('library') }]
+      .concat(playlists.slice(0, 7).map(p => ({
+        name: p.name, list: p.trackIds.map(byId).filter(Boolean), emoji: '🎵', open: () => setView(p.id)
+      })));
+    tiles.forEach(t => {
+      const el = document.createElement('div'); el.className = 'q-tile';
+      el.appendChild(makeArt('q-art', t.list, t.name, t.emoji));
+      const n = document.createElement('div'); n.className = 'q-name'; n.textContent = t.name;
+      const pb = document.createElement('button'); pb.className = 'q-play'; pb.textContent = '▶'; pb.title = 'Play';
+      pb.onclick = e => { e.stopPropagation(); playList(t.list); };
+      el.append(n, pb); el.onclick = t.open; grid.appendChild(el);
+    });
+    box.appendChild(grid);
+
+    // shelves
+    const shelves = document.createElement('div'); shelves.className = 'shelves';
+    const trackCard = (t, list) => {
+      const ids = list.map(x => x.id);
+      return card({
+        art: makeArt('card-art', [t], titleOf(t)),
+        title: titleOf(t), sub: artistOf(t),
+        onOpen: () => playTrack(t.id, ids), onPlay: () => playTrack(t.id, ids)
+      });
+    };
+
+    const recent = recents.map(byId).filter(Boolean).slice(0, 15);
+    if (recent.length) shelves.appendChild(shelf('Jump back in', recent.map(t => trackCard(t, recent))));
+
+    const added = tracks.slice().sort((a, b) => (b.added || 0) - (a.added || 0)).slice(0, 15);
+    shelves.appendChild(shelf('Recently added', added.map(t => trackCard(t, added))));
+
+    if (playlists.length) {
+      shelves.appendChild(shelf('Your playlists', playlists.map(p => {
+        const list = p.trackIds.map(byId).filter(Boolean);
+        return card({
+          art: makeArt('card-art', list, p.name, '🎵'),
+          title: p.name, sub: 'Playlist • ' + plural(list.length, 'song'),
+          onOpen: () => setView(p.id), onPlay: () => playList(list)
+        });
+      })));
+    }
+
+    const artists = groupBy(t => t.artist).slice(0, 15);
+    if (artists.length) {
+      shelves.appendChild(shelf('Artists', artists.map(a => card({
+        art: makeArt('card-art round', a.list, a.name),
+        title: a.name, sub: 'Artist',
+        onOpen: () => openFiltered(a.name), onPlay: () => playList(a.list)
+      }))));
+    }
+
+    const albums = groupBy(t => t.album).slice(0, 15);
+    if (albums.length) {
+      shelves.appendChild(shelf('Albums', albums.map(a => card({
+        art: makeArt('card-art', a.list, a.name),
+        title: a.name, sub: artistOf(a.list[0]),
+        onOpen: () => openFiltered(a.name), onPlay: () => playList(a.list)
+      }))));
+    }
+
+    box.appendChild(shelves);
+    $('main').scrollTop = st;
+  }
+
   function updateBar() {
     const t = byId(curId);
     $('npName').textContent = t ? titleOf(t) : 'Nothing playing';
@@ -753,7 +991,14 @@
     $('play').textContent = audio.paused ? '▶' : '⏸';
     renderNP();
   }
-  function renderAll() { renderSidebar(); renderMain(); updateBar(); }
+  // skipHome = don't rebuild the Home page (keeps its shelves from jumping around while you play songs)
+  function renderAll(skipHome) {
+    renderSidebar();
+    if (view === 'home') { if (!skipHome) renderHome(); }
+    else renderMain();
+    showView();
+    updateBar();
+  }
 
   /* ================= Now Playing page ================= */
   function setNpBottom() { npPage.style.bottom = ($('bar').offsetHeight + 16) + 'px'; }
@@ -849,13 +1094,14 @@
     else if (!queue.includes(id)) queue = [id];
     if (!fromHistory && curId != null && curId !== id) history.push(curId);
     curId = id;
+    pushRecent(id);
     msg('');
     if (currentUrl) URL.revokeObjectURL(currentUrl);
     currentUrl = URL.createObjectURL(t.blob);
     retried.delete(id);
     audio.src = currentUrl;
     audio.play().catch(e => { if (e.name !== 'AbortError') msg('Press play to start (' + e.name + ').', true); });
-    renderAll();
+    renderAll(true);
     if ('mediaSession' in navigator) {
       const u = coverUrl(t);
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -889,7 +1135,7 @@
     if (i > 0) playTrack(queue[i - 1], null, true); else audio.currentTime = 0;
   }
   function startView() {
-    const ids = viewList().map(t => t.id);
+    const ids = currentIds();
     if (!ids.length) return;
     const first = shuffleOn ? ids[Math.floor(Math.random() * ids.length)] : ids[0];
     playTrack(first, ids);
@@ -935,7 +1181,9 @@
   /* ================= wiring ================= */
   $('addBtn').onclick = () => $('files').click();
   $('files').onchange = e => { addFiles(e.target.files); e.target.value = ''; };
+  $('navHome').onclick = () => setView('home');
   $('navLib').onclick = () => setView('library');
+  $('logoHome').onclick = () => setView('home');
   $('newPl').onclick = async () => {
     const name = await askName('New playlist');
     if (name) { const p = await createPlaylist(name); setView(p.id); }
@@ -1150,6 +1398,11 @@
   /* ================= update log ================= */
   // Add new releases at the TOP of this list.
   const CHANGELOG = [
+    { v: '1.3', date: 'Nov 2026', notes: [
+      'Added a Home page with quick-access tiles, Jump back in, Recently added, playlists, artists, and albums',
+      'Added a YOUR LIBRARY button next to HOME',
+      'Clicking the VibeX logo now goes Home'
+    ]},
     { v: '1.2', date: 'Nov 2026', notes: [
       'Added Settings window with a 10-band equalizer and presets',
       'Added volume leveling',
@@ -1187,6 +1440,7 @@
     db = d;
     tracks = (await idb('tracks', 'readonly', s => s.getAll())) || [];
     playlists = (await idb('playlists', 'readonly', s => s.getAll())) || [];
+    ready = true;
     renderAll();
     // songs saved by the older version have no tags yet: read them now
     for (const t of tracks.filter(t => !t.metaDone)) {
@@ -1198,6 +1452,8 @@
     }
     renderAll();
   }).catch(() => {
+    ready = true;
+    renderAll();
     msg('Browser storage is unavailable here, so songs and playlists will not be saved after you close the page.', true);
   });
 })();
