@@ -165,6 +165,7 @@
   .ctl:hover { color: #fff; }
   .ctl.on { color: var(--green); }
   .ctl.on::after { content: ""; position: absolute; left: 50%; bottom: -3px; width: 4px; height: 4px; border-radius: 50%; background: var(--green); transform: translateX(-50%); }
+  .ctl svg { display: block; }
   .play-btn { width: 36px; height: 36px; border-radius: 50%; background: #fff; color: #000; border: none; font-size: 1rem; cursor: pointer; display: grid; place-items: center; }
   .play-btn:hover { transform: scale(1.06); }
   .progress { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 560px; font-size: .72rem; color: var(--muted); }
@@ -305,6 +306,40 @@
     .shelf-row { padding: 0 10px 6px; }
     .card { flex-basis: 140px; padding: 10px; }
   }
+
+  /* ---------- Audio output picker ---------- */
+  body.dev-open { grid-template-columns: 260px 1fr 340px; }
+  body.dev-open #npPage { right: 356px; }
+  #devPanel { display: none; background: var(--panel); border-radius: 8px; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; }
+  body.dev-open #devPanel { display: flex; }
+  .dp-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 18px 6px; }
+  .dp-head h3 { margin: 0; font-size: 1.1rem; }
+  .dp-x { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; }
+  .dp-x:hover { color: #fff; background: #2a2a2a; }
+  .dp-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 10px 16px; }
+  .dp-sec { padding: 16px 10px 6px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .dp-note { color: var(--muted); font-size: .85rem; line-height: 1.5; padding: 6px 10px; }
+  .dp-actions { display: flex; gap: 10px; flex-wrap: wrap; padding: 12px 10px 4px; }
+  .dp-link { background: none; border: none; color: var(--muted); text-decoration: underline; cursor: pointer; font-size: .82rem; padding: 6px 10px 0; text-align: left; }
+  .dp-link:hover { color: #fff; }
+  .dev-row { display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 8px; cursor: pointer; }
+  .dev-row:hover { background: rgba(255,255,255,.08); }
+  .dev-row.cur { background: rgba(255,255,255,.1); cursor: default; }
+  .dev-ic { font-size: 1.4rem; width: 32px; text-align: center; flex-shrink: 0; }
+  .dev-name { font-weight: 700; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dev-sub { font-size: .78rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dev-row.cur .dev-name, .dev-row.cur .dev-sub { color: var(--green); }
+  #toast {
+    position: fixed; left: 50%; bottom: 110px; transform: translate(-50%, 10px); background: #fff; color: #000;
+    font-weight: 700; font-size: .88rem; padding: 10px 18px; border-radius: 500px; box-shadow: 0 10px 30px rgba(0,0,0,.5);
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 70; max-width: 90vw; text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (max-width: 800px) {
+    body.dev-open { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
+    body.dev-open #npPage { right: 8px; }
+    body.dev-open #devPanel { position: fixed; left: 8px; right: 8px; top: 8px; bottom: 106px; z-index: 45; }
+  }
 </style>
 </head>
 <body>
@@ -365,6 +400,12 @@
   </div>
 </main>
 
+<!-- Audio output panel -->
+<aside id="devPanel" aria-label="Audio output">
+  <div class="dp-head"><h3>Audio output</h3><button class="dp-x" id="devClose" title="Close" aria-label="Close">✕</button></div>
+  <div class="dp-body" id="devBody"></div>
+</aside>
+
 <!-- Now Playing page -->
 <section id="npPage" aria-label="Now playing">
   <div class="np-top">
@@ -410,12 +451,16 @@
   </div>
 
   <div class="right">
+    <button class="ctl" id="devBtn" title="Audio output" aria-label="Audio output">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="13" height="10" rx="1.5"/><path d="M6 18h5M8.5 14v4"/><rect x="17" y="8" width="5" height="12" rx="1.5"/><circle cx="19.5" cy="16" r="1"/></svg>
+    </button>
     <button class="ctl" id="mute" title="Mute">🔊</button>
     <input type="range" id="vol" min="0" max="100" value="80">
   </div>
 </footer>
 
 <div id="menu"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <dialog id="dlg"><div id="dlgBody"></div><div class="dlg-actions" id="dlgActions"></div></dialog>
 
 <!-- Settings window -->
@@ -499,6 +544,13 @@
   const isAudio = f => f.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a|aac|flac|opus|weba)$/i.test(f.name);
   const msg = (t, err) => { const m = $('msg'); m.textContent = t || ''; m.className = err ? 'err' : ''; };
   const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+
+  let toastTimer = null;
+  function toast(text) {
+    const el = $('toast'); el.textContent = text; el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+  }
 
   function coverUrl(t) {
     if (!t || !t.cover) return null;
@@ -1001,7 +1053,11 @@
   }
 
   /* ================= Now Playing page ================= */
-  function setNpBottom() { npPage.style.bottom = ($('bar').offsetHeight + 16) + 'px'; }
+  function setNpBottom() {
+    const b = ($('bar').offsetHeight + 16) + 'px';
+    npPage.style.bottom = b;
+    $('devPanel').style.bottom = b;
+  }
 
   function openNP() {
     if (curId == null || npOpen) return;
@@ -1019,7 +1075,7 @@
     if (!fromPop) { try { if (window.history.state && window.history.state.np) window.history.back(); } catch (e) {} }
   }
   window.addEventListener('popstate', () => { if (npOpen) closeNP(true); });
-  window.addEventListener('resize', () => { if (npOpen) setNpBottom(); });
+  window.addEventListener('resize', setNpBottom);
 
   function setNpBackground(t) {
     const apply = c => { npPage.style.background = `linear-gradient(180deg, ${c} 0%, #121212 90%)`; };
@@ -1234,7 +1290,10 @@
   audio.volume = 0.8; setPct($('vol')); setPct($('seek'));
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && npOpen && !dlg.open && !$('settings').open) { closeNP(); return; }
+    if (e.key === 'Escape' && !dlg.open && !$('settings').open && (npOpen || devOpen)) {
+      if (npOpen) closeNP(); else setDevOpen(false);
+      return;
+    }
     if (e.target.tagName === 'INPUT' && e.target.type !== 'range') return;
     if (dlg.open || $('settings').open) return;
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
@@ -1302,6 +1361,7 @@
       graphReady = true;
       applyEq();
       if (actx.state === 'suspended') actx.resume();
+      if (out.id) applySink(out.id).catch(() => {});   // send the new audio engine to the device you picked
     } catch (e) { graphFailed = true; }
     updateEqNote();
   }
@@ -1395,9 +1455,193 @@
   };
   $('eqLevel').onchange = e => { eq.leveling = e.target.checked; applyEq(); saveSettings(); };
 
+  /* ================= audio output (choose where the sound plays) ================= */
+  const OUT_KEY = 'vibex-output-v1';
+  const md = navigator.mediaDevices || null;
+  const canSink = typeof HTMLMediaElement !== 'undefined' && 'setSinkId' in HTMLMediaElement.prototype;
+  // id '' means "system default"
+  const out = { id: '', label: '', devices: [], defLabel: '', partial: true, ids: new Set() };
+  try {
+    const s = JSON.parse(localStorage.getItem(OUT_KEY));
+    if (s && typeof s.id === 'string') { out.id = s.id; out.label = s.label || ''; }
+  } catch (e) {}
+  const saveOut = () => { try { localStorage.setItem(OUT_KEY, JSON.stringify({ id: out.id, label: out.label })); } catch (e) {} };
+  let devOpen = false;
+
+  const devIcon = n => /head|buds|airpods|earphone|headset|bluetooth/i.test(n) ? '🎧'
+    : /hdmi|monitor|display|screen|\btv\b/i.test(n) ? '🖥️' : '🔊';
+  const sinkError = e => e && e.name === 'NotFoundError' ? 'That device is not available right now'
+    : e && e.name === 'NotAllowedError' ? 'Your browser needs permission for that device. Try "Choose a device…"'
+    : (e && e.message) || "Couldn't switch the audio output";
+
+  // read the list of speakers/headphones the browser knows about
+  async function loadDevices() {
+    if (!md || !md.enumerateDevices) { out.devices = []; out.partial = true; return; }
+    try {
+      const all = (await md.enumerateDevices()).filter(d => d.kind === 'audiooutput');
+      out.ids = new Set(all.map(d => d.deviceId));
+      out.partial = all.length === 0 || all.some(d => !d.label);
+      const def = all.find(d => d.deviceId === 'default');
+      out.defLabel = ((def && def.label) || '').replace(/^default\s*[-–—]\s*/i, '');
+      out.devices = all.filter(d => d.label && d.deviceId !== 'default' && d.deviceId !== 'communications');
+    } catch (e) { out.devices = []; out.partial = true; }
+  }
+
+  // actually move the sound to a device
+  async function applySink(id) {
+    if (graphReady) {                                   // the equalizer engine owns the sound output
+      if (!actx.setSinkId) throw new Error('This browser version cannot switch output while the equalizer engine is on. Try an up to date Chrome or Edge.');
+      await actx.setSinkId(id);
+    } else if (canSink) {
+      await audio.setSinkId(id);
+    } else {
+      throw new Error("Your browser can't choose an audio output");
+    }
+  }
+
+  async function chooseDevice(id, label) {
+    try {
+      await applySink(id);
+      out.id = id; out.label = label || ''; saveOut();
+      toast(id ? 'Playing on ' + label : 'Playing on your system default');
+    } catch (e) { toast(sinkError(e)); }
+    updateDevBtn(); renderDevices();
+  }
+
+  // opens the browser's own "pick a speaker" popup (no microphone permission needed)
+  async function pickDevice() {
+    try {
+      const d = await md.selectAudioOutput();
+      await loadDevices();
+      const isDef = d.deviceId === 'default';
+      await chooseDevice(isDef ? '' : d.deviceId, isDef ? '' : (d.label || 'Selected device'));
+    } catch (e) {
+      if (e && e.name !== 'AbortError' && e.name !== 'NotAllowedError') toast(sinkError(e));
+    }
+  }
+
+  // asks for microphone permission only so the browser shares device NAMES (nothing is recorded)
+  async function revealAll() {
+    try {
+      const s = await md.getUserMedia({ audio: true });
+      s.getTracks().forEach(t => t.stop());
+    } catch (e) { toast('Permission was not granted'); return; }
+    await loadDevices(); renderDevices();
+  }
+
+  function devRow(icon, name, sub, cur, onClick) {
+    const r = document.createElement('div'); r.className = 'dev-row' + (cur ? ' cur' : '');
+    const ic = document.createElement('div'); ic.className = 'dev-ic'; ic.textContent = icon;
+    const tx = document.createElement('div'); tx.style.minWidth = 0;
+    const n = document.createElement('div'); n.className = 'dev-name'; n.textContent = name;
+    const s = document.createElement('div'); s.className = 'dev-sub'; s.textContent = sub;
+    tx.append(n, s); r.append(ic, tx);
+    if (!cur && onClick) r.onclick = onClick;
+    return r;
+  }
+  const dpSec = t => { const d = document.createElement('div'); d.className = 'dp-sec'; d.textContent = t; return d; };
+  const dpNote = t => { const d = document.createElement('div'); d.className = 'dp-note'; d.textContent = t; return d; };
+
+  function renderDevices() {
+    const box = $('devBody'); box.innerHTML = '';
+    if (!canSink || !md) {
+      box.appendChild(dpNote("Your browser can't choose where sound plays. Chrome and Edge on a computer can. In other browsers, change the output in your computer's sound settings."));
+      return;
+    }
+    const defName = out.defLabel || "Your computer's default output";
+
+    // what you are listening on right now
+    box.appendChild(dpSec('Listening on'));
+    const curDev = out.id ? out.devices.find(d => d.deviceId === out.id) : null;
+    const curName = out.id ? ((curDev && curDev.label) || out.label || 'Selected device') : 'System default';
+    box.appendChild(devRow(devIcon(out.id ? curName : defName), curName, out.id ? 'Current device' : defName, true));
+
+    // other places the sound can go
+    box.appendChild(dpSec('Select another device'));
+    let any = false;
+    if (out.id) {
+      any = true;
+      box.appendChild(devRow(devIcon(defName), 'System default', defName, false, () => chooseDevice('', '')));
+    }
+    out.devices.filter(d => d.deviceId !== out.id).forEach(d => {
+      any = true;
+      box.appendChild(devRow(devIcon(d.label), d.label, 'Click to play here', false, () => chooseDevice(d.deviceId, d.label)));
+    });
+    if (!any) box.appendChild(dpNote('No other devices found.'));
+
+    // buttons
+    const act = document.createElement('div'); act.className = 'dp-actions';
+    if (md.selectAudioOutput) {
+      const b = document.createElement('button'); b.className = 'pill'; b.textContent = 'Choose a device…';
+      b.onclick = pickDevice; act.appendChild(b);
+    }
+    const rf = document.createElement('button'); rf.className = 'pill'; rf.textContent = '↻ Refresh';
+    rf.onclick = async () => { await loadDevices(); renderDevices(); toast('Device list updated'); };
+    act.appendChild(rf);
+    box.appendChild(act);
+
+    if (out.partial && md.getUserMedia) {
+      const l = document.createElement('button'); l.className = 'dp-link'; l.textContent = 'Show all my devices';
+      l.onclick = revealAll; box.appendChild(l);
+      box.appendChild(dpNote('This asks for microphone permission only so your browser will share the device names. Nothing is recorded.'));
+    }
+
+    box.appendChild(dpSec("Don't see your device?"));
+    box.appendChild(dpNote("Connect your headphones or Bluetooth speaker in your computer's sound settings first, then press Refresh."));
+  }
+
+  function updateDevBtn() {
+    const b = $('devBtn');
+    b.classList.toggle('on', !!out.id);
+    b.title = out.id ? 'Audio output: ' + (out.label || 'selected device') : 'Audio output';
+  }
+
+  async function setDevOpen(v) {
+    devOpen = v;
+    document.body.classList.toggle('dev-open', v);
+    setNpBottom();
+    if (v) { renderDevices(); await loadDevices(); renderDevices(); }
+  }
+
+  // bring back the device you used last time
+  async function restoreOutput() {
+    if (!out.id) return;
+    await loadDevices();
+    try { await applySink(out.id); }
+    catch (e) {
+      const was = out.label || 'your device';
+      out.id = ''; out.label = ''; saveOut();
+      try { await applySink(''); } catch (_) {}
+      toast("Couldn't reconnect to " + was + ". Using your system default.");
+      updateDevBtn(); renderDevices();
+    }
+  }
+
+  $('devBtn').onclick = () => setDevOpen(!devOpen);
+  $('devClose').onclick = () => setDevOpen(false);
+
+  // headphones plugged in or unplugged
+  if (md && md.addEventListener) {
+    md.addEventListener('devicechange', async () => {
+      await loadDevices();
+      if (out.id && !out.partial && !out.ids.has(out.id)) {
+        const was = out.label || 'Your device';
+        out.id = ''; out.label = ''; saveOut();
+        try { await applySink(''); } catch (_) {}
+        toast(was + ' was disconnected. Switched to your system default.');
+        updateDevBtn();
+      }
+      if (devOpen) renderDevices();
+    });
+  }
+
   /* ================= update log ================= */
   // Add new releases at the TOP of this list.
   const CHANGELOG = [
+    { v: '1.4', date: 'Nov 2026', notes: [
+      'Added an audio output picker (the speaker icon next to the volume control) to choose where the music plays, like Spotify Connect',
+      'Lists your speakers and headphones, remembers your choice, and switches back to the default if a device is unplugged'
+    ]},
     { v: '1.3', date: 'Nov 2026', notes: [
       'Added a Home page with quick-access tiles, Jump back in, Recently added, playlists, artists, and albums',
       'Added a YOUR LIBRARY button next to HOME',
@@ -1433,6 +1677,7 @@
   })();
 
   buildEqUI(); refreshEqUI(); updateEqNote();
+  updateDevBtn(); restoreOutput();
 
   /* ================= init ================= */
   renderAll();
