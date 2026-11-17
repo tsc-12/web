@@ -248,11 +248,15 @@
   .log-date { color: var(--muted); font-size: .8rem; }
   .log-entry ul { margin: 0; padding-left: 20px; line-height: 1.6; font-size: .9rem; }
 
-  /* ---------- Settings gear icon ---------- */
-  .icon-btn { margin-left: auto; background: none; border: none; color: var(--muted); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; }
+  /* ---------- Settings gear + Stats icon ---------- */
+  .icon-btn { background: none; border: none; color: var(--muted); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; flex-shrink: 0; }
   .icon-btn:hover { color: #fff; background: var(--hover); }
-  .icon-btn svg { transition: transform .35s; }
-  .icon-btn:hover svg { transform: rotate(60deg); }
+  .icon-btn.on { color: var(--green); background: var(--hover); }
+  #navStats { margin-left: auto; }
+  #navSettings svg { transition: transform .35s; }
+  #navSettings:hover svg { transform: rotate(60deg); }
+  #navStats svg { transition: transform .2s; }
+  #navStats:hover svg { transform: scale(1.12); }
 
   /* ---------- Home page ---------- */
   .logo-home { display: flex; align-items: center; gap: 8px; cursor: pointer; }
@@ -340,6 +344,53 @@
     body.dev-open #npPage { right: 8px; }
     body.dev-open #devPanel { position: fixed; left: 8px; right: 8px; top: 8px; bottom: 106px; z-index: 45; }
   }
+
+  /* ---------- Listening Stats page ---------- */
+  .ls-top { padding: 32px 28px 8px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .ls-top h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.6rem); }
+  .ls-top .pill { margin-left: auto; }
+  .ls-sub { padding: 0 28px; color: var(--muted); font-size: .9rem; margin: 0 0 6px; }
+  .ls-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; padding: 14px 28px 6px; }
+  .ls-card { background: rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; }
+  .ls-card .v { font-size: 1.7rem; font-weight: 800; line-height: 1.1; }
+  .ls-card .l { color: var(--muted); font-size: .78rem; margin-top: 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .ls-card.green .v { color: var(--green); }
+  .ls-sec { padding: 22px 28px 0; }
+  .ls-sec h2 { margin: 0 0 12px; font-size: 1.3rem; }
+  .ls-panel { background: rgba(0,0,0,.25); border-radius: 10px; padding: 16px; }
+  .ls-chart { display: flex; align-items: flex-end; gap: 8px; height: 150px; }
+  .ls-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
+  .ls-bar { width: 100%; max-width: 46px; background: var(--green); border-radius: 4px 4px 0 0; min-height: 2px; transition: height .3s; }
+  .ls-bar.zero { background: #3a3a3a; }
+  .ls-col .bv { font-size: .68rem; color: var(--muted); height: 1em; white-space: nowrap; }
+  .ls-col .bl { font-size: .72rem; color: var(--muted); }
+  .ls-col.today .bl { color: #fff; font-weight: 700; }
+  .ls-hours { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; align-items: end; height: 90px; }
+  .ls-hours .hb { background: var(--green); border-radius: 2px 2px 0 0; min-height: 2px; opacity: .9; }
+  .ls-hours .hb.zero { background: #3a3a3a; }
+  .ls-hlabels { display: flex; justify-content: space-between; color: var(--muted); font-size: .7rem; margin-top: 6px; }
+  .ls-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+  .ls-two .ls-sec { min-width: 0; }
+  .ls-row { display: flex; align-items: center; gap: 12px; padding: 8px 6px; border-radius: 6px; }
+  .ls-row.click { cursor: pointer; }
+  .ls-row.click:hover { background: rgba(255,255,255,.08); }
+  .ls-rank { width: 22px; text-align: center; color: var(--muted); font-weight: 700; }
+  .ls-who { flex: 1; min-width: 0; }
+  .ls-who .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+  .ls-who .a { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-size: .78rem; }
+  .ls-val { color: var(--muted); font-size: .8rem; text-align: right; white-space: nowrap; }
+  .ls-meter { height: 3px; background: #333; border-radius: 2px; margin-top: 5px; overflow: hidden; }
+  .ls-meter i { display: block; height: 100%; background: var(--green); }
+  .ls-none { color: var(--muted); padding: 10px 6px; font-size: .9rem; }
+  .ls-empty { text-align: center; padding: 70px 24px; color: var(--muted); line-height: 1.5; }
+  .ls-empty h2 { color: var(--text); margin: 0 0 8px; font-size: 1.6rem; }
+  .ls-foot { padding: 22px 28px 36px; color: var(--muted); font-size: .78rem; }
+  @media (max-width: 800px) {
+    .ls-top { padding: 22px 18px 6px; }
+    .ls-sub, .ls-cards, .ls-sec, .ls-foot { padding-left: 18px; padding-right: 18px; }
+    .ls-two { grid-template-columns: 1fr; }
+    .ls-cards { grid-template-columns: 1fr 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -349,6 +400,9 @@
     <div class="logo-home" id="logoHome" title="Home">
       <span>♪</span> <b class="brand">VibeX</b>
     </div>
+    <button class="icon-btn" id="navStats" title="Listening stats" aria-label="Listening stats">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V11M12 20V4M18 20V14"/></svg>
+    </button>
     <button class="icon-btn" id="navSettings" title="Settings" aria-label="Settings">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
@@ -367,6 +421,9 @@
 
   <!-- Home page -->
   <div id="homeView"></div>
+
+  <!-- Listening stats page -->
+  <div id="statsView" hidden></div>
 
   <!-- Library / playlist page -->
   <div id="libView" hidden>
@@ -509,7 +566,7 @@
   /* ================= state ================= */
   let tracks = [];            // song records
   let playlists = [];         // {id, name, trackIds[]}
-  let view = 'home';          // 'home', 'library', or a playlist id
+  let view = 'home';          // 'home', 'stats', 'library', or a playlist id
   let ready = false;          // true once saved songs have been loaded
   let sortKey = '', sortDir = 1;
   let queue = [];             // track ids currently being played through
@@ -530,6 +587,13 @@
     recents = [id, ...recents.filter(x => x !== id)].slice(0, 30);
     try { localStorage.setItem(RECENT_KEY, JSON.stringify(recents)); } catch (e) {}
   }
+
+  // listening stats (saved in this browser)
+  const STATS_KEY = 'vibex-stats-v1';
+  let stats = { total: 0, plays: 0, songs: {}, artists: {}, days: {}, hours: new Array(24).fill(0), since: Date.now() };
+  try { Object.assign(stats, JSON.parse(localStorage.getItem(STATS_KEY)) || {}); } catch (e) {}
+  if (!Array.isArray(stats.hours) || stats.hours.length !== 24) stats.hours = new Array(24).fill(0);
+  let lastT = null, curListen = 0, counted = false, lastStatSave = 0, statsDirty = false;
 
   /* ================= helpers ================= */
   const byId = id => tracks.find(t => t.id === id);
@@ -784,8 +848,8 @@
     }
     return list;
   }
-  // song ids to play through from the page you are on (Home = whole library)
-  const currentIds = () => (view === 'home' ? tracks.map(t => t.id) : viewList().map(t => t.id));
+  // song ids to play through from the page you are on (Home / Stats = whole library)
+  const currentIds = () => (view === 'home' || view === 'stats' ? tracks.map(t => t.id) : viewList().map(t => t.id));
 
   function setView(v, keepSearch) {
     view = v; sortKey = '';
@@ -794,14 +858,15 @@
   }
 
   function showView() {
-    const home = view === 'home';
-    $('homeView').hidden = !home;
-    $('libView').hidden = home;
+    $('homeView').hidden = view !== 'home';
+    $('statsView').hidden = view !== 'stats';
+    $('libView').hidden = view === 'home' || view === 'stats';
   }
 
   function renderSidebar() {
     $('navHome').className = 'nav-item' + (view === 'home' ? ' active' : '');
     $('navLib').className = 'nav-item' + (view === 'library' ? ' active' : '');
+    $('navStats').classList.toggle('on', view === 'stats');
     const box = $('plList'); box.innerHTML = '';
     if (!playlists.length) {
       const d = document.createElement('div'); d.className = 'pl-none';
@@ -818,7 +883,7 @@
   }
 
   function renderMain() {
-    if (view === 'home') return;
+    if (view === 'home' || view === 'stats') return;
     const pl = playlists.find(p => p.id === view);
     const base = baseList();
     const list = viewList();
@@ -1034,6 +1099,233 @@
     $('main').scrollTop = st;
   }
 
+  /* ================= Listening stats ================= */
+  const dayKey = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+
+  function fmtTime(sec) {
+    sec = Math.round(sec || 0);
+    if (sec < 60) return sec + 's';
+    const m = Math.round(sec / 60);
+    if (m < 60) return m + ' min';
+    const h = Math.floor(sec / 3600), mm = Math.floor((sec % 3600) / 60);
+    return h + ' hr' + (mm ? ' ' + mm + ' min' : '');
+  }
+  const fmtShort = sec => {
+    sec = Math.round(sec || 0);
+    if (!sec) return '';
+    if (sec < 60) return sec + 's';
+    if (sec < 3600) return Math.round(sec / 60) + 'm';
+    return (sec / 3600).toFixed(1).replace(/\.0$/, '') + 'h';
+  };
+
+  function saveStats(force) {
+    if (!statsDirty && !force) return;
+    const now = Date.now();
+    if (!force && now - lastStatSave < 5000) return;
+    lastStatSave = now; statsDirty = false;
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+    if (view === 'stats' && !force) renderStats();    // live update while you're looking at it
+  }
+
+  function addListen(d) {
+    const t = byId(curId); if (!t) return;
+    const now = new Date();
+    stats.total += d;
+    const dk = dayKey(now);
+    stats.days[dk] = (stats.days[dk] || 0) + d;
+    stats.hours[now.getHours()] += d;
+
+    const s = stats.songs[curId] || (stats.songs[curId] = { t: '', a: '', sec: 0, plays: 0 });
+    s.t = titleOf(t); s.a = t.artist || '';
+    s.sec += d;
+    const an = t.artist || 'Unknown artist';
+    const ar = stats.artists[an] || (stats.artists[an] = { sec: 0, plays: 0 });
+    ar.sec += d;
+
+    curListen += d;
+    const need = t.duration > 0 ? Math.min(30, t.duration * 0.5) : 30;   // a "play" = 30s (or half a short song)
+    if (!counted && curListen >= need) {
+      counted = true; stats.plays++; s.plays++; ar.plays++;
+    }
+    statsDirty = true;
+  }
+
+  function trackStat() {
+    if (audio.paused || curId == null) { lastT = null; return; }
+    const now = audio.currentTime;
+    if (lastT != null) {
+      const d = now - lastT;
+      if (d > 0 && d < 1.5) addListen(d);      // ignore seeks / jumps
+    }
+    lastT = now;
+    saveStats();
+  }
+
+  function streakDays() {
+    let n = 0;
+    const d = new Date();
+    if (!(stats.days[dayKey(d)] > 0)) d.setDate(d.getDate() - 1);   // today may not have started yet
+    while (stats.days[dayKey(d)] > 0) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function statRows(items, kind) {
+    const wrap = el('div', 'ls-panel');
+    if (!items.length) { wrap.appendChild(el('div', 'ls-none', 'Nothing here yet. Play some music!')); return wrap; }
+    const max = items[0].sec || 1;
+    items.forEach((it, i) => {
+      const row = el('div', 'ls-row' + (it.onClick ? ' click' : ''));
+      row.appendChild(el('div', 'ls-rank', i + 1));
+      const th = el('div', 'thumb' + (kind === 'artist' ? '' : ''));
+      if (kind === 'artist') th.style.borderRadius = '50%';
+      if (it.track) fillThumb(th, it.track);
+      else { th.setAttribute('style', thumbStyle(it.title) + (kind === 'artist' ? ';border-radius:50%' : '')); th.textContent = it.title.charAt(0).toUpperCase(); }
+      row.appendChild(th);
+      const who = el('div', 'ls-who');
+      who.appendChild(el('div', 't', it.title));
+      if (it.sub) who.appendChild(el('div', 'a', it.sub));
+      const meter = el('div', 'ls-meter'); const bar = document.createElement('i');
+      bar.style.width = Math.max(3, it.sec / max * 100) + '%'; meter.appendChild(bar);
+      who.appendChild(meter);
+      row.appendChild(who);
+      row.appendChild(el('div', 'ls-val', plural(it.plays, 'play') + ' · ' + fmtTime(it.sec)));
+      if (it.onClick) row.onclick = it.onClick;
+      wrap.appendChild(row);
+    });
+    return wrap;
+  }
+
+  function renderStats() {
+    if (view !== 'stats') return;
+    const st = $('main').scrollTop;
+    const box = $('statsView'); box.innerHTML = '';
+    if (!ready) return;
+
+    const top = el('div', 'ls-top');
+    top.appendChild(el('h1', '', 'Listening Stats'));
+    const rb = el('button', 'pill danger', 'Reset stats');
+    rb.onclick = () => {
+      const note = el('p', '', 'This clears your listening history and charts only. Your songs and playlists are not touched.');
+      note.style.cssText = 'color:#b3b3b3;margin:0';
+      openDialog('Reset listening stats?', [note], [{ label: 'Cancel' }, { label: 'Reset', cls: 'danger', fn: () => {
+        stats = { total: 0, plays: 0, songs: {}, artists: {}, days: {}, hours: new Array(24).fill(0), since: Date.now() };
+        curListen = 0; counted = false; lastT = null;
+        saveStats(true); renderStats(); toast('Listening stats reset');
+      } }]);
+    };
+    top.appendChild(rb);
+    box.appendChild(top);
+
+    if (stats.total < 1) {
+      const w = el('div', 'ls-empty');
+      w.innerHTML = '<h2>No listening yet</h2><p>Play a few songs and your stats will show up here.<br>Everything is saved on this device only.</p>';
+      box.appendChild(w);
+      $('main').scrollTop = st;
+      return;
+    }
+
+    const since = new Date(stats.since || Date.now());
+    box.appendChild(el('p', 'ls-sub', 'Tracking since ' + since.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })));
+
+    // summary cards
+    const today = stats.days[dayKey()] || 0;
+    const uniq = Object.keys(stats.songs).length;
+    const streak = streakDays();
+    const cards = el('div', 'ls-cards');
+    [
+      ['Total listening time', fmtTime(stats.total), true],
+      ['Today', fmtTime(today)],
+      ['Total plays', String(stats.plays)],
+      ['Different songs', String(uniq)],
+      ['Day streak', plural(streak, 'day')]
+    ].forEach(([l, v, g]) => {
+      const c = el('div', 'ls-card' + (g ? ' green' : ''));
+      c.appendChild(el('div', 'v', v)); c.appendChild(el('div', 'l', l));
+      cards.appendChild(c);
+    });
+    box.appendChild(cards);
+
+    // last 7 days
+    const sec7 = el('div', 'ls-sec');
+    sec7.appendChild(el('h2', '', 'Last 7 days'));
+    const p7 = el('div', 'ls-panel'); const ch = el('div', 'ls-chart');
+    const days = [];
+    for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); days.push(d); }
+    const max7 = Math.max(60, ...days.map(d => stats.days[dayKey(d)] || 0));
+    days.forEach((d, i) => {
+      const v = stats.days[dayKey(d)] || 0;
+      const col = el('div', 'ls-col' + (i === 6 ? ' today' : ''));
+      col.appendChild(el('div', 'bv', fmtShort(v)));
+      const b = el('div', 'ls-bar' + (v ? '' : ' zero'));
+      b.style.height = (v ? Math.max(3, v / max7 * 100) : 2) + '%';
+      b.title = d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' }) + ': ' + fmtTime(v);
+      col.appendChild(b);
+      col.appendChild(el('div', 'bl', i === 6 ? 'Today' : d.toLocaleDateString(undefined, { weekday: 'short' })));
+      ch.appendChild(col);
+    });
+    p7.appendChild(ch); sec7.appendChild(p7); box.appendChild(sec7);
+
+    // time of day
+    const secH = el('div', 'ls-sec');
+    secH.appendChild(el('h2', '', 'When you listen'));
+    const pH = el('div', 'ls-panel'); const hg = el('div', 'ls-hours');
+    const maxH = Math.max(1, ...stats.hours);
+    stats.hours.forEach((v, h) => {
+      const b = el('div', 'hb' + (v ? '' : ' zero'));
+      b.style.height = (v ? Math.max(4, v / maxH * 100) : 2) + '%';
+      const label = (h % 12 || 12) + (h < 12 ? ' AM' : ' PM');
+      b.title = label + ': ' + fmtTime(v);
+      hg.appendChild(b);
+    });
+    pH.appendChild(hg);
+    const hl = el('div', 'ls-hlabels');
+    ['12 AM', '6 AM', '12 PM', '6 PM', '11 PM'].forEach(x => hl.appendChild(el('span', '', x)));
+    pH.appendChild(hl);
+    const peak = stats.hours.indexOf(maxH);
+    if (maxH > 1) pH.appendChild(el('div', 'ls-none', 'You listen most around ' + (peak % 12 || 12) + (peak < 12 ? ' AM' : ' PM') + '.'));
+    secH.appendChild(pH); box.appendChild(secH);
+
+    // top songs + top artists
+    const two = el('div', 'ls-two');
+
+    const secS = el('div', 'ls-sec');
+    secS.appendChild(el('h2', '', 'Top songs'));
+    const songs = Object.entries(stats.songs)
+      .map(([id, s]) => {
+        const tid = byId(id) ? id : (byId(Number(id)) ? Number(id) : null);
+        const track = tid != null ? byId(tid) : null;
+        return { title: track ? titleOf(track) : (s.t || 'Unknown song'), sub: track ? artistOf(track) : (s.a || 'Unknown artist'),
+          sec: s.sec, plays: s.plays, track,
+          onClick: track ? () => playTrack(track.id, tracks.map(x => x.id)) : null };
+      })
+      .sort((a, b) => b.plays - a.plays || b.sec - a.sec).slice(0, 10);
+    secS.appendChild(statRows(songs, 'song'));
+    two.appendChild(secS);
+
+    const secA = el('div', 'ls-sec');
+    secA.appendChild(el('h2', '', 'Top artists'));
+    const artists = Object.entries(stats.artists)
+      .map(([name, a]) => {
+        const list = tracks.filter(t => (t.artist || 'Unknown artist') === name);
+        return { title: name, sub: '', sec: a.sec, plays: a.plays, track: list.find(t => t.cover) || null,
+          onClick: list.length ? () => playList(list) : null };
+      })
+      .sort((a, b) => b.sec - a.sec).slice(0, 10);
+    secA.appendChild(statRows(artists, 'artist'));
+    two.appendChild(secA);
+    box.appendChild(two);
+
+    box.appendChild(el('div', 'ls-foot', 'A play counts after you listen to 30 seconds of a song. Stats are stored in this browser only.'));
+    $('main').scrollTop = st;
+  }
+
   function updateBar() {
     const t = byId(curId);
     $('npName').textContent = t ? titleOf(t) : 'Nothing playing';
@@ -1047,6 +1339,7 @@
   function renderAll(skipHome) {
     renderSidebar();
     if (view === 'home') { if (!skipHome) renderHome(); }
+    else if (view === 'stats') { if (!skipHome) renderStats(); }
     else renderMain();
     showView();
     updateBar();
@@ -1149,7 +1442,9 @@
     if (newQueue) { queue = newQueue.slice(); }
     else if (!queue.includes(id)) queue = [id];
     if (!fromHistory && curId != null && curId !== id) history.push(curId);
+    saveStats();
     curId = id;
+    lastT = null; curListen = 0; counted = false;      // fresh stats window for this play
     pushRecent(id);
     msg('');
     if (currentUrl) URL.revokeObjectURL(currentUrl);
@@ -1208,9 +1503,11 @@
   }
 
   /* ================= audio events ================= */
-  audio.addEventListener('play', () => { updateBar(); renderMain(); });
-  audio.addEventListener('pause', () => { updateBar(); renderMain(); });
-  audio.addEventListener('ended', () => next(true));
+  audio.addEventListener('play', () => { lastT = audio.currentTime; updateBar(); renderMain(); });
+  audio.addEventListener('pause', () => { lastT = null; saveStats(true); updateBar(); renderMain(); if (view === 'stats') renderStats(); });
+  audio.addEventListener('seeking', () => { lastT = null; });
+  audio.addEventListener('seeked', () => { lastT = audio.paused ? null : audio.currentTime; });
+  audio.addEventListener('ended', () => { lastT = null; curListen = 0; counted = false; saveStats(true); next(true); });
   audio.addEventListener('loadedmetadata', () => {
     $('dur').textContent = fmt(audio.duration);
     const t = byId(curId);
@@ -1219,6 +1516,7 @@
   audio.addEventListener('timeupdate', () => {
     $('cur').textContent = fmt(audio.currentTime);
     if (audio.duration) { $('seek').value = audio.currentTime / audio.duration * 1000; setPct($('seek')); }
+    trackStat();
   });
   audio.addEventListener('error', () => {
     const t = byId(curId); if (!t) return;
@@ -1234,12 +1532,17 @@
       : 'Your browser cannot play this format (' + (t.type || 'unknown') + '). Try mp3 or wav.', true);
   });
 
+  // make sure stats are saved when you leave the page
+  document.addEventListener('visibilitychange', () => { if (document.hidden) saveStats(true); });
+  window.addEventListener('pagehide', () => saveStats(true));
+
   /* ================= wiring ================= */
   $('addBtn').onclick = () => $('files').click();
   $('files').onchange = e => { addFiles(e.target.files); e.target.value = ''; };
   $('navHome').onclick = () => setView('home');
   $('navLib').onclick = () => setView('library');
   $('logoHome').onclick = () => setView('home');
+  $('navStats').onclick = () => setView(view === 'stats' ? 'home' : 'stats');
   $('newPl').onclick = async () => {
     const name = await askName('New playlist');
     if (name) { const p = await createPlaylist(name); setView(p.id); }
@@ -1638,6 +1941,11 @@
   /* ================= update log ================= */
   // Add new releases at the TOP of this list.
   const CHANGELOG = [
+    { v: '1.5', date: 'Nov 2026', notes: [
+      'Added a Listening Stats page (the bar chart icon next to the settings gear)',
+      'Shows total listening time, plays, today, day streak, a last 7 days chart, and when you listen most',
+      'Shows your top songs and top artists, with a button to reset the stats'
+    ]},
     { v: '1.4', date: 'Nov 2026', notes: [
       'Added an audio output picker (the speaker icon next to the volume control) to choose where the music plays, like Spotify Connect',
       'Lists your speakers and headphones, remembers your choice, and switches back to the default if a device is unplugged'
